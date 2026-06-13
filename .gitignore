@@ -1,0 +1,5 @@
+﻿mlruns/
+*.db
+.ipynb_checkpoints/
+tourism_project/tourism_project/
+Git Token.txt
