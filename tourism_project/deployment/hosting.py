@@ -1,10 +1,12 @@
 """
 hosting.py
-Pushes the deployment files (app.py, requirements.txt, Dockerfile) to the
+Pushes the deployment files (app.py, requirements.txt, README.md) to the
 Hugging Face Space that serves the Streamlit frontend.
 
 This is the last pipeline step: once the best model is registered, this puts a
 working UI in front of it so anyone with the Space link can score a customer.
+The Space uses Hugging Face's native Streamlit SDK, so no Dockerfile or manual
+port config is needed — HF handles the runtime.
 """
 
 import os
@@ -16,12 +18,12 @@ SPACE_REPO = "iamanshkataria/tourism-package-app"
 
 api = HfApi(token=HF_TOKEN)
 
-# Create the Space if needed. Docker SDK because the project ships a Dockerfile.
+# Create the Space if needed. Streamlit SDK = HF runs app.py directly, no Docker.
 try:
     create_repo(
         repo_id=SPACE_REPO,
         repo_type="space",
-        space_sdk="docker",
+        space_sdk="streamlit",
         token=HF_TOKEN,
         exist_ok=True,
     )
@@ -30,7 +32,7 @@ except HfHubHTTPError as e:
     print(f"Space check/create returned: {e}")
 
 # Push each deployment file up to the Space root.
-for fname in ["app.py", "requirements.txt", "Dockerfile"]:
+for fname in ["app.py", "requirements.txt", "README.md"]:
     api.upload_file(
         path_or_fileobj=f"tourism_project/deployment/{fname}",
         path_in_repo=fname,
